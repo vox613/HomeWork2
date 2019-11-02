@@ -73,12 +73,6 @@ public class Main {
         System.out.println("\nMap after removing :");
         System.out.println(newMap.toString());
 
-   /*     Random rand = new Random();
-        for (int i = 0; i < 500; i++) {
-            newMap.put(rand.nextInt(5000), rand.nextInt(100));
-            System.out.println("Map   - " + newMap.toString());
-        }
-*/
 
         System.out.println("\nSize   - " + newMap.size());
 
