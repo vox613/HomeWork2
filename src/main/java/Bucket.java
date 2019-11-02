@@ -5,19 +5,19 @@ public class Bucket {
     private Node[] nodeMass;
     private int bucketCapacity = 20;
 
-    public Bucket() {
+    Bucket() {
         nodeMass = new Node[bucketCapacity];
-
     }
 
 
-    public Object removeNode(Object key) {
+    Object removeNode(Object key) {
         Object oldValue;
 
         if (key == null) {
             oldValue = nodeMass[0].getValue();
             numOfEntry--;
             nodeMass[0] = null;
+            trimMass(0);
             return oldValue;
         } else {
             for (int i = 0; i < bucketCapacity; i++) {
@@ -25,7 +25,7 @@ public class Bucket {
                     if (nodeMass[i].getKey().equals(key)) {
                         oldValue = nodeMass[i].getValue();
                         numOfEntry--;
-                        nodeMass[i] = null;
+                        trimMass(i);
                         return oldValue;
                     }
                 }
@@ -35,35 +35,40 @@ public class Bucket {
     }
 
 
-    public Object add(Node node) {
-        Object temp;
-        for (int i = 0; i < bucketCapacity; i++) {
-            if (nodeMass[i] != null) {
-                if (nodeMass[i].getKey() != null) {
-                    if (node.getKeyHashCode() == nodeMass[i].getKeyHashCode()) {
-                        System.out.println(">>> Hash == Hash <<<");
-                        if (node.getKey().equals(nodeMass[i].getKey())) {
-                            System.out.println(">>> Key == Key <<<");
-                            System.out.println("oldVal = " + nodeMass[i].getValue() + " // newVal = " + node.getValue());
-                            temp = nodeMass[i].getValue();
-                            nodeMass[i].setValue(node.getValue());
-                            return temp;
-                        } else {
-                            System.out.println(">>> Differents key <<<");
-                        }
-                    } else {
-                        System.out.println(">>> Differents hCode <<<");
-                    }
+    private void trimMass(int index) {
+        if (index < bucketCapacity - 1) {
+            for (int i = index + 1; i < bucketCapacity; i++) {                            // fix before - numOfEntry
+                if (nodeMass[i] != null) {
+                    nodeMass[i - 1] = nodeMass[i];
+                    nodeMass[i] = null;
+                } else {
+                    nodeMass[i - 1] = null;
+                    break;
                 }
-            } else {
-                System.out.println("numOfEntry < 20 = " + (numOfEntry < 20) + "  numOfEntry = " + numOfEntry);
-                if (numOfEntry < bucketCapacity) {
-                    System.out.println(">>> Add new object <<<");
+            }
+        }
+    }
+
+
+    Object add(Node node) {
+        Object temp;
+        if (numOfEntry == 20) {
+            throw new ArrayIndexOutOfBoundsException();
+        } else {
+            for (int i = 0; i < bucketCapacity; i++) {
+                if (nodeMass[i] != null) {
+                    if (nodeMass[i].getKey() != null) {
+                        if (node.getKeyHashCode() == nodeMass[i].getKeyHashCode()) {
+                            if (node.getKey().equals(nodeMass[i].getKey())) {
+                                temp = nodeMass[i].getValue();
+                                nodeMass[i].setValue(node.getValue());
+                                return temp;
+                            }
+                        }
+                    }
+                } else {
                     nodeMass[i] = node;
                     numOfEntry++;
-                    if (numOfEntry == bucketCapacity) {
-                        System.out.println("!!! Bucket " + i + " OVERFLOW !!!");
-                    }
                     return null;
                 }
             }
@@ -72,47 +77,40 @@ public class Bucket {
     }
 
 
-    public Object putNullKey(Node node) {
-        System.out.println("here");
+    Object putNullKey(Node node) {
         Object temp;
-
-        if (nodeMass[0] != null) {
-            if (nodeMass[0].getKey() == null) {
-                System.out.println("Zero pos have null key and vlue = " + nodeMass[0].getValue());
-                temp = nodeMass[0].getValue();
-                nodeMass[0].setValue(node.getValue());
-                return temp;
-            } else {
-                System.out.println("Zero pos have NOT null key");
-                System.out.println(nodeMass[0].toString());
-                if (bucketCapacity - numOfEntry > 0) {
+        if (numOfEntry == 20) {
+            throw new ArrayIndexOutOfBoundsException();
+        } else {
+            if (nodeMass[0] != null) {
+                if (nodeMass[0].getKey() == null) {
+                    temp = nodeMass[0].getValue();
+                    nodeMass[0].setValue(node.getValue());
+                    return temp;
+                } else {
                     for (int i = bucketCapacity - 1; i > 0; i--) {                            // fix before - numOfEntry
                         nodeMass[i] = nodeMass[i - 1];
                     }
                     nodeMass[0] = node;
                     numOfEntry++;
                     return null;
-                } else {  // увеличение размеа массива в бакете
-                    System.out.println("!!! Max length bucket !!!");
                 }
+            } else {
+                nodeMass[0] = node;
+                numOfEntry++;
+                return null;
             }
-        } else {
-            nodeMass[0] = node;
-            numOfEntry++;
-            return null;
         }
-        return null;
+
     }
 
 
-    public boolean haveKey(Object key) {
+    boolean haveKey(Object key) {
         if (key != null) {
             for (int i = 0; i < bucketCapacity; i++) {                                      // fix before - numOfEntry
-                if (nodeMass[i] != null) {
-                    if (nodeMass[i].getKey() != null) {
-                        if (nodeMass[i].getKey().equals(key)) {
-                            return true;
-                        }
+                if ((nodeMass[i] != null) && (nodeMass[i].getKey() != null)) {
+                    if (nodeMass[i].getKey().equals(key)) {
+                        return true;
                     }
                 }
             }
@@ -125,7 +123,7 @@ public class Bucket {
     }
 
 
-    public Node takeNode(Object key) {
+    Node takeNode(Object key) {
         if (key == null) {
             if (haveKey(null)) {
                 return nodeMass[0];
@@ -134,18 +132,15 @@ public class Bucket {
             }
         } else {
             for (int i = 0; i < bucketCapacity; i++) {                                     // fix before - numOfEntry
-                if (nodeMass[i] != null) {
-                    if (nodeMass[i].getKey() != null) {
-                        if (nodeMass[i].getKey().equals(key)) {
-                            return nodeMass[i];
-                        }
+                if ((nodeMass[i] != null) && (nodeMass[i].getKey() != null)) {
+                    if (nodeMass[i].getKey().equals(key)) {
+                        return nodeMass[i];
                     }
                 }
             }
         }
         return null;
     }
-
 
     public String toString() {
         StringBuilder str = new StringBuilder("");
@@ -160,22 +155,7 @@ public class Bucket {
         return str.toString();
     }
 
-
-
-
-    public Node[] getNodeMass() {
-        return nodeMass;
-    }
-
-    public int getBucketCapacity() {
-        return bucketCapacity;
-    }
-
-    public int getNumOfEntry() {
+    int getNumOfEntry() {
         return numOfEntry;
-    }
-
-    public void setNumOfEntry(int numOfEntry) {
-        this.numOfEntry = numOfEntry;
     }
 }

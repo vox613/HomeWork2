@@ -1,14 +1,9 @@
-import org.jcp.xml.dsig.internal.SignerOutputStream;
-
 public class NewMap {
-    private int pairCounter = 0;
     private final int mapCapacity;
-    private String keyType;
-    private String valueType;
     private Bucket[] bucketMass;
 
 
-    public NewMap(int mapCapacity) {
+    NewMap(int mapCapacity) {
         this.mapCapacity = mapCapacity;
         bucketMass = new Bucket[mapCapacity];
         for (int i = 0; i < mapCapacity; i++) {
@@ -17,28 +12,22 @@ public class NewMap {
     }
 
 
-    public void put(Object key, Object value) {             // должен возвращать старое значение value или null
-        if(key == null) {
-            System.out.println("\nbucketNum = " + 0 + "   key = " + key);
-            bucketMass[0].putNullKey(new Node(key, value));
-            System.out.println(bucketMass[0].toString());
-        }else{
+    Object put(Object key, Object value) throws ArrayIndexOutOfBoundsException {             // должен возвращать старое значение value или null
+        if (key == null) {
+            return bucketMass[0].putNullKey(new Node(key, value));
+        } else {
             int bucketNum = getIndex(key);
-            System.out.println("\nbucketNum = " + bucketNum + "   key = " + key);
-            bucketMass[bucketNum].add(new Node(key, value));
-            System.out.println(bucketMass[bucketNum].toString());
+            return bucketMass[bucketNum].add(new Node(key, value));
         }
-
         //if(bucketMass[getIndex(key)].takeNode(key).getNext() == null){ }
     }
 
 
-
-    public Object get (Object key){
-        if(containsKey(key)){
-            if(key == null){
+    Object get(Object key) {
+        if (containsKey(key)) {
+            if (key == null) {
                 return bucketMass[0].takeNode(key).getValue();
-            }else{
+            } else {
                 return bucketMass[getIndex(key)].takeNode(key).getValue();
             }
         }
@@ -46,61 +35,47 @@ public class NewMap {
     }
 
 
-
-
-    public Object remove (Object key){
+    Object remove(Object key) {
         Object oldValue = null;
         int index = (key == null) ? 0 : getIndex(key);
 
-        if(containsKey(key)){
+        if (containsKey(key)) {
             oldValue = bucketMass[index].removeNode(key);
-            System.out.println("Remove key: " + key + " return - " + oldValue);
-            return  oldValue;
-        }else{
+            return oldValue;
+        } else {
             return null;
         }
     }
 
 
-
-
-    public boolean containsKey (Object key){
-        if(key == null){
+    boolean containsKey(Object key) {
+        if (key == null) {
             return bucketMass[0].haveKey(key);
-        }else{
+        } else {
             return bucketMass[getIndex(key)].haveKey(key);
         }
     }
 
 
-
-
-
-    public int size(){
+    int size() {
         int size = 0;
         for (int i = 0; i < mapCapacity; i++) {
             size += bucketMass[i].getNumOfEntry();
-            System.out.println("Bucket " + i + " size = " + bucketMass[i].getNumOfEntry());
         }
         return size;
     }
 
 
-    public String toString(){
-        StringBuilder str = new StringBuilder(" ");
+    public String toString() {
+        StringBuilder str = new StringBuilder("");
         for (int i = 0; i < mapCapacity; i++) {
-            //if(bucketMass[i] == null){
-            //    System.out.println("Bucket " + i + " : " + "null");
-            //    str.append("null");
-            //}else{
-                System.out.println("Bucket " + i + " : " + bucketMass[i].toString());
-                str.append(bucketMass[i].toString());
-            //}
-
+            //System.out.println("Bucket " + i + " : " + bucketMass[i].toString());
+            str.append("Bucket " + i + " : ");
+            str.append(bucketMass[i].toString());
+            str.append("\n");
         }
         return str.toString();
     }
-
 
     private int getIndex(Object key) {
         return newHash(key.hashCode());
@@ -110,12 +85,4 @@ public class NewMap {
         return (keyHashCode & (mapCapacity - 1));
     }
 
-
-    public int getMapCapacity() {
-        return mapCapacity;
-    }
-
-    public Bucket[] getBucketMass() {
-        return bucketMass;
-    }
 }
