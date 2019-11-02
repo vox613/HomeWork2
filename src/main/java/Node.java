@@ -2,25 +2,22 @@ public class Node {
     private Object key;
     private Object value;
     private int keyHashCode;
-    Node next = null;
-
 
 
     Node(Object key, Object value) {
         this.key = key;
         this.value = value;
-        if(key == null){
+        if (key == null) {
             this.keyHashCode = 0;
-        }else{
+        } else {
             this.keyHashCode = key.hashCode();
         }
     }
 
 
-    public String toString(){
+    public String toString() {
         return "[" + key + ":" + value + "]";
     }
-
 
 
     void setValue(Object value) {

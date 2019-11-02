@@ -70,7 +70,7 @@ public class NewMap {
         StringBuilder str = new StringBuilder("");
         for (int i = 0; i < mapCapacity; i++) {
             //System.out.println("Bucket " + i + " : " + bucketMass[i].toString());
-            str.append("Bucket " + i + " : ");
+            str.append("Bucket ").append(i).append(" : ");
             str.append(bucketMass[i].toString());
             str.append("\n");
         }

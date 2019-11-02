@@ -1,7 +1,3 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 public class Main {
     public static void main(String[] args) {
 
@@ -49,7 +45,7 @@ public class Main {
         System.out.println("Get pair = " + newMap.get("newEl"));
         System.out.println("Get pair = " + newMap.get("852"));
         System.out.println("Get pair = " + newMap.get(null));
-        System.out.println("Get pair = " + newMap.get("newEl") );
+        System.out.println("Get pair = " + newMap.get("newEl"));
         System.out.println("Remove pair = " + newMap.remove("newEl"));
 
         System.out.println("\n>>>  Remove test  <<<");
